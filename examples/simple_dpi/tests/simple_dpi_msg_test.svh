@@ -1,0 +1,42 @@
+/****************************************************************************
+ * simple_dpi_msg_test.svh
+ ****************************************************************************/
+`ifndef INCLUDED_simple_dpi_msg_test_svh
+`define INCLUDED_simple_dpi_msg_test_svh
+
+/**
+ * Class: simple_dpi_msg_test
+ * 
+ * TODO: Add class documentation
+ */
+ 
+import "DPI-C" context task msg_test_main(string connector_path);
+	
+class simple_dpi_msg_test extends simple_dpi_test_base;
+	`uvm_component_utils(simple_dpi_msg_test)
+	
+	function new(string name, uvm_component parent);
+		super.new(name, parent);
+	endfunction
+
+	/**
+	 * Function: build_phase
+	 *
+	 * Override from class amber_uvm_sdv_test_base
+	 */
+	virtual function void build_phase(input uvm_phase phase);
+		super.build_phase(phase);
+	endfunction
+
+	/**
+	 * Task: run_phase
+	 *
+	 * Override from class amber_uvm_sdv_test_base
+	 */
+	virtual task run_phase(input uvm_phase phase);
+		msg_test_main("*.m_sdv_connector");
+	endtask
+
+endclass
+
+`endif /* INCLUDED_simple_dpi_msg_test_svh */
