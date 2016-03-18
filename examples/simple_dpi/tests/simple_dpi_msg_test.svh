@@ -9,9 +9,6 @@
  * 
  * TODO: Add class documentation
  */
- 
-import "DPI-C" context task msg_test_main(string connector_path);
-	
 class simple_dpi_msg_test extends simple_dpi_test_base;
 	`uvm_component_utils(simple_dpi_msg_test)
 	
@@ -34,7 +31,7 @@ class simple_dpi_msg_test extends simple_dpi_test_base;
 	 * Override from class amber_uvm_sdv_test_base
 	 */
 	virtual task run_phase(input uvm_phase phase);
-		msg_test_main("*.m_sdv_connector");
+		test_main("*.m_sdv_connector");
 	endtask
 
 endclass

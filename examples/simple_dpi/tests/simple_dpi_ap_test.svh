@@ -10,8 +10,6 @@
  * TODO: Add class documentation
  */
  
-import "DPI-C" context task ap_test_main(string connector_path);
-	
 class simple_dpi_ap_test extends simple_dpi_test_base;
 	`uvm_component_utils(simple_dpi_ap_test)
 	
@@ -54,7 +52,7 @@ class simple_dpi_ap_test extends simple_dpi_test_base;
 		
 		fork 
 			begin
-				ap_test_main("*.m_sdv_connector");
+				test_main("*.m_sdv_connector");
 			end
 		join_none
 		

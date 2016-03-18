@@ -10,6 +10,7 @@ ARCH=$(shell uname -m)
 
 ifeq (Cygwin,$(OS))
   DYNLINK=false
+  DLLEXT=.dll
   ifeq ($(ARCH), x86_64)
     PLATFORM=cygwin64
   else
@@ -17,6 +18,8 @@ ifeq (Cygwin,$(OS))
   endif
 else # Linux
 ifeq ($(shell uname),Linux)
+  DLLEXT=.so
+  LIBPREF=lib
   DYNLINK=true
   ifeq ($(ARCH), x86_64)
     PLATFORM=linux_x86_64
@@ -37,13 +40,6 @@ ifeq (Cygwin,$(OS))
   endif
   SYSTEMC_LIB=$(SYSTEMC_LIBDIR)/libsystemc.a
   LINK_SYSTEMC=$(SYSTEMC_LIBDIR)/libsystemc.a
-endif
-
-ifeq ($(PLATFORM),win32) 
-DLLEXT=.dll
-else
-DLLEXT=.so
-LIBPREF=lib
 endif
 
 ifeq (,$(A23_CXX))

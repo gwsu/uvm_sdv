@@ -1,6 +1,4 @@
 
-import "DPI-C" context task config_test_main(string connector_path);
-
 class simple_dpi_config_test extends simple_dpi_test_base;
 	`uvm_component_utils(simple_dpi_config_test)
 	
@@ -23,7 +21,7 @@ class simple_dpi_config_test extends simple_dpi_test_base;
 	endfunction
 
 	task main_phase(uvm_phase phase);
-		config_test_main("*.m_sdv_connector");
+		test_main("*.m_sdv_connector");
 	endtask
 	
 endclass

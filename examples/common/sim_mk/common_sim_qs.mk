@@ -8,14 +8,21 @@
 #export LD_LIBRARY_PATH
 #CXXFLAGS += -I$(QUESTA_HOME)/include -I$(QUESTA_HOME)/include/systemc
 
-DPI_LIBS += $(SVF_LIBDIR)/dpi/libsvf_dpi
-DPI_LIBS += $(BUILD_DIR)/libs/tb_dpi
+#DPI_LIBS += $(SVF_LIBDIR)/dpi/libsvf_dpi
+#DPI_LIBS += $(BUILD_DIR)/libs/tb_dpi
 
 ifneq (,$(QUESTA_HOME))
 # Set path so we use the compiler with Modelsim
-PATH := $(QUESTA_HOME)/bin:$(QUESTA_HOME)/gcc-4.5.0-linux/bin:$(PATH)
-export PATH
+# PATH := $(QUESTA_HOME)/bin:$(QUESTA_HOME)/gcc-4.5.0-linux/bin:$(PATH)
+# export PATH
+else
+QUESTA_HOME:=$(dir $(dir $(shell which vsim)))
 endif
+
+GCC_INSTALL := $(QUESTA_HOME)/gcc-4.5.0-mingw64vc12
+CC:=$(GCC_INSTALL)/bin/gcc
+CXX:=$(GCC_INSTALL)/bin/g++
+LD:=$(GCC_INSTALL)/bin/ld
 
 ifeq ($(DEBUG),true)
 	TOP=$(TOP_MODULE)_dbg
@@ -23,6 +30,17 @@ ifeq ($(DEBUG),true)
 else
 	TOP=$(TOP_MODULE)_opt
 endif
+
+ifeq (Cygwin,$(OS))
+DPI_LINK=-L$(QUESTA_HOME)/win64/
+QUESTA_HOME:= $(shell cygpath -w $(QUESTA_HOME))
+
+DPI_LIB := -Bsymbolic -L $(QUESTA_HOME)/win64 -lmtipli
+endif
+
+define MK_DPI
+	$(LINK) $(DLLOUT) -o $@ $^ $(DPI_LIB)
+endef
 
 build : vlog_build $(LIB_TARGETS) $(TESTBENCH_OBJS) target_build
 
@@ -70,5 +88,5 @@ run :
 	vmap work $(BUILD_DIR)/work
 	vsim -c -do run.do $(TOP) -coverage \
 		+TESTNAME=$(TESTNAME) -f sim.f \
-		$(foreach dpi,$(DPI_LIBS),-sv_lib $(dpi))
+		$(foreach dpi,$(DPI_LIBRARIES),-sv_lib $(dpi))
 

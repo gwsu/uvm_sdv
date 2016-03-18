@@ -1,13 +1,36 @@
 #include "uvm_sdv_dpi_transport.h"
 #include "uvm_sdv_config.h"
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+#include <windows.h>
+#else
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 #include <dlfcn.h>
+#endif
 
 typedef void *svScope;
 
-svScope svGetScopeFromName(const char *name);
-svScope svGetScope(void);
-void svSetScope(const svScope);
-const char *svGetNameFromScope(const svScope);
+#if defined(__CYGWIN__) || defined(_WIN32) || defined(__MINGW32__)
+#define EXTERN_I __declspec(dllimport)
+#define EXTERN_E __declspec(dllexport)
+#else
+#define EXTERN_I
+#define EXTERN_E
+#endif
+
+#if defined(_WIN32) || defined(__CYGWIN__)
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
+
+
+EXTERN_I svScope svGetScopeFromName(const char *name);
+EXTERN_I svScope svGetScope(void);
+EXTERN_I void svSetScope(const svScope);
+EXTERN_I const char *svGetNameFromScope(const svScope);
 
 static char prv_scope[1024];
 
@@ -23,9 +46,15 @@ typedef struct dpi_transport_s {
 	svScope						scope;
 } dpi_transport_t;
 
-extern void _uvm_sdv_dpi_write_sw2uvm(const char *, uint32_t);
-extern void _uvm_sdv_dpi_read_uvm2sw(const char *, uint32_t*, uint32_t*, uint32_t);
-extern const char *_uvm_sdv_dpi_connect(const char *path_name);
+void (*uvm_sdv_dpi_write_sw2uvm_p)(const char *, uint32_t) = 0;
+void (*uvm_sdv_dpi_read_uvm2sw_p)(const char *, uint32_t *, uint32_t *, uint32_t) = 0;
+const char *(*uvm_sdv_dpi_connect_p)(const char *) = 0;
+
+/*
+void _uvm_sdv_dpi_write_sw2uvm(const char *, uint32_t);
+void _uvm_sdv_dpi_read_uvm2sw(const char *, uint32_t*, uint32_t*, uint32_t);
+const char *_uvm_sdv_dpi_connect(const char *path_name);
+ */
 
 static uvm_sdv_transport_msg_t *dpi_transport_recv_msg(
 		uvm_sdv_transport_t				*tp,
@@ -161,47 +190,47 @@ static void dpi_transport_free_msg(
 	// TODO: mutex
 }
 
-int _uvm_sdv_dpi_init(void)
+DLL_EXPORT int _uvm_sdv_dpi_init(void)
 {
 	svScope scope = svGetScope();
 	strcpy(prv_scope, svGetNameFromScope(scope));
+	fprintf(stdout, "uvm_sdv_dpi_init\n");
+	fflush(stdout);
+	if (!uvm_sdv_dpi_connect_p) {
+#if defined(_WIN32) || defined(__CYGWIN__)
+		// This is Windows- and Questa-specific code
+		HANDLE hndl = GetModuleHandle("export_tramp.dll");
+		if (!hndl) {
+			hndl = GetModuleHandle(0); // try default
+		}
+		uvm_sdv_dpi_connect_p = (const char *(*)(const char *))GetProcAddress(hndl, "_uvm_sdv_dpi_connect");
+		uvm_sdv_dpi_read_uvm2sw_p = (void (*)(const char *, uint32_t *, uint32_t *, uint32_t))GetProcAddress(hndl, "_uvm_sdv_dpi_read_uvm2sw");
+		uvm_sdv_dpi_write_sw2uvm_p = (void (*)(const char *, uint32_t))GetProcAddress(hndl, "_uvm_sdv_dpi_write_sw2uvm");
+#else
+		void *hndl = RTLD_DEFAULT;
+		uvm_sdv_dpi_connect_p = (const char *(*)(const char *))dlsym(hndl, "_uvm_sdv_dpi_connect");
+		uvm_sdv_dpi_read_uvm2sw_p = (void (*)(const char *, uint32_t *, uint32_t *, uint32_t))dlsym(hndl, "_uvm_sdv_dpi_read_uvm2sw");
+		uvm_sdv_dpi_write_sw2uvm_p = (void (*)(const char *, uint32_t))dlsym(hndl, "_uvm_sdv_dpi_write_sw2uvm");
+#endif
+	}
 	return 1;
 }
 
-uvm_sdv_transport_t *uvm_sdv_dpi_transport_create(const char *agent_path)
+DLL_EXPORT uvm_sdv_transport_t *uvm_sdv_dpi_transport_create(const char *agent_path)
 {
 	uvm_sdv_transport_t *tp = (uvm_sdv_transport_t *)malloc(sizeof(uvm_sdv_transport_t));
 	dpi_transport_t *tp_prv = (dpi_transport_t *)malloc(sizeof(dpi_transport_t));
 	svScope scope = svGetScopeFromName(prv_scope);
 	const char *full_agent_path;
-//	void *f;
 
 	svSetScope(scope);
 
 	memset(tp_prv, 0, sizeof(dpi_transport_t));
 
-	/*
-	if ((f = dlsym(0, "_uvm_sdv_dpi_write_sw2uvm"))) {
-		tp_prv->write_func = (void (*)(uint32_t))f;
-	} else {
-		fprintf(stderr, "Failed to locate symbol _uvm_sdv_dpi_write_sw2uvm: %s\n",
-				dlerror());
-		exit(1);
-	}
-
-	if ((f = dlsym(0, "_uvm_sdv_dpi_read_uvm2sw"))) {
-		tp_prv->read_func = (void (*)(uint32_t*, uint32_t*, uint32_t))f;
-	} else {
-		fprintf(stderr, "Failed to locate symbol _uvm_sdv_dpi_read_uvm2sw: %s\n",
-				dlerror());
-		exit(1);
-	}
-	 */
-
-	full_agent_path = _uvm_sdv_dpi_connect(agent_path);
+	full_agent_path = uvm_sdv_dpi_connect_p(agent_path);
 	tp_prv->connection = strdup(full_agent_path);
-	tp_prv->write_func = &_uvm_sdv_dpi_write_sw2uvm;
-	tp_prv->read_func = &_uvm_sdv_dpi_read_uvm2sw;
+	tp_prv->write_func = uvm_sdv_dpi_write_sw2uvm_p;
+	tp_prv->read_func = uvm_sdv_dpi_read_uvm2sw_p;
 
 	tp->prv_data = tp_prv;
 	tp_prv->msg_alloc = 0;

@@ -16,7 +16,14 @@ $SCRIPT_DIR=dirname($SCRIPT);
 $COMMON_DIR=dirname($SCRIPT_DIR);
 $ROOTDIR=dirname($COMMON_DIR);
 
+($sysname,$nodename,$release,$version,$machine) = POSIX::uname();
+
 $SIM_DIR=getcwd();
+
+if ($sysname =~ /CYGWIN/) {
+	$SIM_DIR =~ s%^/cygdrive/([a-zA-Z])%$1:%;
+}
+
 $ENV{SIM_DIR}=$SIM_DIR;
 
 # common variables with set_env.sh
@@ -125,26 +132,18 @@ for ($i=0; $i <= $#ARGV; $i++) {
   }
 }
 
-# Setup link to rundir if it's different than local
-#$local_rundir = getcwd() . "/rundir";
-#unless ($run_root eq $local_rundir) {
-#  if (-d $local_rundir) { 
-#    print "rundir is directory\n";
-#  } elsif (-l $local_rundir) {
-#    print "rundir is link\n";
-#  } else {
-#    print "rundir doesn't exist\n";
-#  }
-#  print "ln -s $run_root rundir\n";
-#  system("ln -s $run_root rundir");
-#}
-
 $project=basename(dirname($SIM_DIR));
 
 $run_root="${run_root}/${project}";
 
 print "run_root=${run_root}\n";
+
+
 $ENV{RUN_ROOT}=$run_root;
+
+if ($sysname =~ /CYGWIN/) {
+	$run_root =~ s%^/cygdrive/([a-zA-Z])%$1:%;
+}
 
 if ($builddir eq "") {
   $builddir=$ENV{RUN_ROOT};
@@ -152,6 +151,11 @@ if ($builddir eq "") {
 
 # TODO: platform too?
 $builddir = $builddir . "/" . $sim;
+
+if ($sysname =~ /CYGWIN/) {
+	$builddir =~ s%^/cygdrive/([a-zA-Z])%$1:%;
+}
+
 $ENV{BUILD_DIR}=$builddir;
 
 print "cmd=$cmd\n";

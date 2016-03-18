@@ -22,10 +22,10 @@ endif
 include $(COMMON_SIM_MK_DIR)/common_defs.mk
 include $(MK_INCLUDES)
 
-ifeq (Cygwin,$(OS))
-BUILD_DIR := $(shell cygpath -w $(BUILD_DIR))
-SIM_DIR := $(shell cygpath -w $(SIM_DIR))
-endif
+#ifeq (Cygwin,$(OS))
+#BUILD_DIR := $(shell cygpath -w $(BUILD_DIR))
+#SIM_DIR := $(shell cygpath -w $(SIM_DIR))
+#endif
 
 CXXFLAGS += $(foreach dir, $(SRC_DIRS), -I$(dir))
 
