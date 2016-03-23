@@ -64,9 +64,9 @@ CXXFLAGS += -I$(VERILATOR_ROOT)/include
 CXXFLAGS += -I$(VERILATOR_ROOT)/include/vltstd
 CXXFLAGS += -std=c++0x
 
-VERBOSE=true
+# VERBOSE=true
 
-ifeq (false,$(VERBOSE))
+ifneq (true,$(VERBOSE))
 Q=@
 endif
 

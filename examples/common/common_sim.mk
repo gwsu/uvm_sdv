@@ -22,6 +22,12 @@ endif
 include $(COMMON_SIM_MK_DIR)/common_defs.mk
 include $(MK_INCLUDES)
 
+ifeq (true,$(DYNLINK))
+DPIEXT=.so
+else
+DPIEXT=.o
+endif
+
 #ifeq (Cygwin,$(OS))
 #BUILD_DIR := $(shell cygpath -w $(BUILD_DIR))
 #SIM_DIR := $(shell cygpath -w $(SIM_DIR))

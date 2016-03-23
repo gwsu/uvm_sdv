@@ -14,7 +14,7 @@ SRC_DIRS += $(SIMPLE_DPI)/tests/sw
 # Must build DPI libraries
 DPI_LIBRARIES += $(call get_plusarg,DPI_LIBRARY,$(PLUSARGS))
 #LIB_TARGETS += $(foreach lib,$(call get_plusarg,DPI_LIBRARY,$(PLUSARGS)),$(lib)$(DLLEXT))
-LIB_TARGETS += $(foreach lib,$(DPI_LIBRARIES),$(lib)$(DLLEXT))
+LIB_TARGETS += $(foreach lib,$(DPI_LIBRARIES),$(lib)$(DPIEXT))
 
 CFLAGS += \
   -I$(SIMPLE_DPI)/tests/sw \
@@ -27,13 +27,11 @@ include $(ROOTDIR)/common/common_sim.mk
 # SIM_DATAFILES += $(call get_plusarg,SW_IMAGE,$(PLUSARGS))
 # UVM_TESTNAME := $(call get_plusarg,UVM_TESTNAME,$(PLUSARGS))
 
-$(BUILD_DIR)/dpi/%$(DLLEXT) : \
-	$(BUILD_DIR)/dpi/%.o \
-	$(BUILD_DIR)/dpi/sw_txn.o \
+$(BUILD_DIR)/dpi/%$(DPIEXT) : \
+	$(BUILD_DIR)/dpi/obj/%.o \
+	$(BUILD_DIR)/dpi/obj/sw_txn.o \
 	$(UVM_SDV_SRC:.c=.o) \
 	$(UVM_SDV_DPI_SRC:.c=.o) 
-	echo "UVM_SDV_C_DIR=$(UVM_SDV_C_DIR)"
-	ls $(UVM_SDV_C_DIR)/common
 	$(MK_DPI)
 
 %.o : $(UVM_SDV)/c/common/%.c
@@ -43,7 +41,7 @@ $(BUILD_DIR)/dpi/%$(DLLEXT) : \
 %.o : $(UVM_SDV)/dpi/%.c
 	$(CC) -c $(CFLAGS) -o $@ $^
 	
-$(BUILD_DIR)/dpi/%.o : $(SIMPLE_DPI)/tests/sw/%.c
+$(BUILD_DIR)/dpi/obj/%.o : $(SIMPLE_DPI)/tests/sw/%.c
 	@if test ! -d `dirname $@`; then mkdir -p `dirname $@`; fi
 	$(CC) -c $(CFLAGS) -o $@ $^
 

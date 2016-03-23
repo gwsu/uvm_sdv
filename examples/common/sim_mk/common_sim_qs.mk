@@ -8,8 +8,6 @@
 #export LD_LIBRARY_PATH
 #CXXFLAGS += -I$(QUESTA_HOME)/include -I$(QUESTA_HOME)/include/systemc
 
-#DPI_LIBS += $(SVF_LIBDIR)/dpi/libsvf_dpi
-#DPI_LIBS += $(BUILD_DIR)/libs/tb_dpi
 
 ifneq (,$(QUESTA_HOME))
 # Set path so we use the compiler with Modelsim
@@ -19,10 +17,12 @@ else
 QUESTA_HOME:=$(dir $(dir $(shell which vsim)))
 endif
 
-GCC_INSTALL := $(QUESTA_HOME)/gcc-4.5.0-mingw64vc12
+# TODO: Auto-identify GCC installation
+GCC_VERSION := 4.5.0
+GCC_INSTALL := $(QUESTA_HOME)/gcc-$(GCC_VERSION)-mingw64vc12
 CC:=$(GCC_INSTALL)/bin/gcc
 CXX:=$(GCC_INSTALL)/bin/g++
-LD:=$(GCC_INSTALL)/bin/ld
+LD:=$(GCC_INSTALL)/libexec/gcc/$(ARCH)-w64-mingw32/4.5.0/ld
 
 ifeq ($(DEBUG),true)
 	TOP=$(TOP_MODULE)_dbg
@@ -32,15 +32,28 @@ else
 endif
 
 ifeq (Cygwin,$(OS))
-DPI_LINK=-L$(QUESTA_HOME)/win64/
 QUESTA_HOME:= $(shell cygpath -w $(QUESTA_HOME))
 
 DPI_LIB := -Bsymbolic -L $(QUESTA_HOME)/win64 -lmtipli
 endif
 
+ifeq (true,$(DYNLINK))
 define MK_DPI
 	$(LINK) $(DLLOUT) -o $@ $^ $(DPI_LIB)
 endef
+else
+define MK_DPI
+	rm -f $@
+	$(LD) -r -o $@ $^ 
+#	$(AR) vcq $@ $^ 
+endef
+endif
+
+ifeq (true,$(QUIET))
+VSIM_FLAGS += -nostdout
+REDIRECT:= >/dev/null 2>&1
+else
+endif
 
 build : vlog_build $(LIB_TARGETS) $(TESTBENCH_OBJS) target_build
 
@@ -50,17 +63,15 @@ vlog_build : vopt
 vopt : vopt_opt vopt_dbg
 
 vopt_opt : vopt_compile
-#	vopt -o $(TB)_opt $(TB) +designfile
-	vopt -o $(TB)_opt $(TB) +cover
+	$(Q)vopt -o $(TB)_opt $(TB) +cover $(REDIRECT)
 
 vopt_dbg : vopt_compile
-#	vopt +acc -o $(TB)_dbg $(TB) +designfile
-	vopt +acc -o $(TB)_dbg $(TB) +cover
+	$(Q)vopt +acc -o $(TB)_dbg $(TB) +cover $(REDIRECT)
 
 vopt_compile :
-	rm -rf work
-	vlib work
-	vlog -sv \
+	$(Q)rm -rf work
+	$(Q)vlib work
+	$(Q)vlog -sv \
 		$(QS_VLOG_ARGS) \
 		$(VLOG_ARGS)
 
@@ -81,12 +92,19 @@ vopt_compile :
 #endif
 #	vsim -c -do run.do $(TOP) -qwavedb=+signal \
 
+ifeq (true,DYNLINK)
+DPI_LIB_OPTIONS := $(foreach dpi,$(DPI_LIBRARIES),-sv_lib $(dpi))
+else
+# DPI_LIB_OPTIONS := $(foreach dpi,$(DPI_LIBRARIES),-dpilib $(dpi)$(DPIEXT))
+DPI_LIB_OPTIONS := $(foreach dpi,$(DPI_LIBRARIES),-ldflags $(dpi)$(DPIEXT))
+endif
+
+
 run :
-	echo $(DOFILE_COMMANDS) > run.do
-	echo "coverage save -onexit cov.ucdb" >> run.do
-	echo "run $(TIMEOUT); quit -f" >> run.do
-	vmap work $(BUILD_DIR)/work
-	vsim -c -do run.do $(TOP) -coverage \
-		+TESTNAME=$(TESTNAME) -f sim.f \
-		$(foreach dpi,$(DPI_LIBRARIES),-sv_lib $(dpi))
+	$(Q)echo $(DOFILE_COMMANDS) > run.do
+	$(Q)echo "coverage save -onexit cov.ucdb" >> run.do
+	$(Q)echo "run $(TIMEOUT); quit -f" >> run.do
+	$(Q)vmap work $(BUILD_DIR)/work $(REDIRECT)
+	$(Q)vsim $(VSIM_FLAGS) -batch -do run.do $(TOP) -coverage -l simx.log \
+		+TESTNAME=$(TESTNAME) -f sim.f $(DPI_LIB_OPTIONS) $(REDIRECT)
 

@@ -109,7 +109,7 @@ for ($i=0; $i <= $#ARGV; $i++) {
     } elsif ($arg eq "-d") {
     	$debug="true";
     } elsif ($arg eq "-quiet") {
-       $quiet=1;
+       $quiet="true";
     } elsif ($arg eq "-sim") {
     	$i++;
     	$sim=$ARGV[$i];
@@ -187,9 +187,9 @@ if ($build == 0 && $clean == 1) {
 
 if ($quiet eq "") {
   if ($#testlist > 0) {
-    $quiet=1;
+    $quiet="true";
   } else {
-    $quiet=0;
+    $quiet="false";
   }
 }
 
@@ -517,7 +517,7 @@ sub run_jobs {
                 }
                 $all_plusargs .= ${plusargs};
                 
-                print "all_plusargs: $all_plusargs\n";
+#                print "all_plusargs: $all_plusargs\n";
                 
                 $run_dir="${run_root}/${testname}_${seed_str}";
                 $testlist_idx++;
@@ -553,7 +553,7 @@ sub run_jobs {
                     	"$SIM_DIR/scripts/Makefile",
                     	"SIM=${sim}",
                     	"SEED=${seed}",
-#                    	"-quiet", "$quiet", 
+                    	"QUIET=${quiet}",
                     	"TESTNAME=${testname}", 
                     	"INTERACTIVE=${interactive}",
                     	"DEBUG=${debug}",
@@ -561,7 +561,7 @@ sub run_jobs {
                     	);
                 
                 	
-                	print "testname=$testname\n"; 
+#                	print "testname=$testname\n"; 
                     
                    
                     open(my $fh, "$SIM_DIR/scripts/status.sh $testname |") or die "Failed to launch check program";

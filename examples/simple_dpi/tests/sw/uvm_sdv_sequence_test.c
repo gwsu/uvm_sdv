@@ -3,8 +3,9 @@
 #include "sw_txn.h"
 #include "uvm_sdv.h"
 #include "uvm_sdv_dpi_transport.h"
+#include "sw_test.h"
 
-int sequence_test_main (const char *agent_path)
+DLL_EXPORT int test_main (const char *agent_path)
 {
     const char *testname = "uvm_sdv_sequence_test";
     int i, cnt;

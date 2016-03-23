@@ -3,14 +3,9 @@
 #include "sw_txn.h"
 #include "uvm_sdv.h"
 #include "uvm_sdv_dpi_transport.h"
+#include "sw_test.h"
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
-
-DLL_EXPORT int seq_driver_test_main (const char *agent_path)
+DLL_EXPORT int test_main (const char *agent_path)
 {
     sw_txn txn;
     uvm_sdv_sequencer_driver_t sw_txn_seqr;

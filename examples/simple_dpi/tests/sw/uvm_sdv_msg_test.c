@@ -3,14 +3,9 @@
 #include "sw_txn.h"
 #include "uvm_sdv.h"
 #include "uvm_sdv_dpi_transport.h"
+#include "sw_test.h"
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
-
-DLL_EXPORT int msg_test_main (const char *agent_path)
+DLL_EXPORT int test_main (const char *agent_path)
 {
     char buf[256];
     int i;
@@ -19,7 +14,6 @@ DLL_EXPORT int msg_test_main (const char *agent_path)
 
     uvm_tp = uvm_sdv_dpi_transport_create(agent_path);
     uvm_sdv_endpoint_mgr_init(uvm_tp);
-
 
     uvm_sdv_raise_objection(testname, 1);
     UVM_INFO(testname, uvm_sformat(buf, "Begin Test %s", testname), UVM_MEDIUM);
@@ -32,6 +26,8 @@ DLL_EXPORT int msg_test_main (const char *agent_path)
     for (i=0; i<5; i++) {
     	UVM_INFO(testname, uvm_sformat(buf, "A=%d B=%d\n", i, (i+5)), UVM_MEDIUM);
     }
+
+    UVM_INFO(testname, "PASS: uvm_sdv_msg_test", UVM_LOW);
 
     uvm_sdv_drop_objection(testname, 1);
 

@@ -24,6 +24,21 @@ class simple_dpi_config_test extends simple_dpi_test_base;
 		test_main("*.m_sdv_connector");
 	endtask
 	
+	/**
+	 * Function: report_phase
+	 *
+	 * Override from class 
+	 */
+//	virtual function void report_phase(input uvm_phase phase);
+//		uvm_report_server svr = get_report_server();
+//		if (svr.get_severity_count(UVM_FATAL) == 0 &&
+//				svr.get_severity_count(UVM_ERROR) == 0) begin
+//			$display("PASS: uvm_sdv_config_test");
+//		end else begin
+//			$display("FAIL: uvm_sdv_config_test");
+//		end
+//	endfunction
+	
 endclass
 
 

@@ -3,12 +3,7 @@
 #include "sw_txn.h"
 #include "uvm_sdv.h"
 #include "uvm_sdv_dpi_transport.h"
-
-#if defined(_WIN32) || defined(__CYGWIN__)
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
+#include "sw_test.h"
 
 DLL_EXPORT int test_main (const char *agent_path)
 {

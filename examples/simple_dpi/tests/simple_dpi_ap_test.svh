@@ -73,7 +73,10 @@ class simple_dpi_ap_test extends simple_dpi_test_base;
 	 * Override from class uvm_component
 	 */
 	virtual function void report_phase(input uvm_phase phase);
-		if (m_transaction_count != 5) begin
+		if (m_transaction_count == 5) begin
+			$display("PASS: uvm_sdv_ap_test");
+		end else begin
+			$display("FAIL: uvm_sdv_ap_test");
 			`uvm_error(get_name(), $psprintf("Expecting 5 transactions; received %0d", m_transaction_count));
 		end
 	endfunction
