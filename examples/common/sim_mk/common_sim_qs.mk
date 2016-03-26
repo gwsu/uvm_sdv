@@ -9,32 +9,52 @@
 #CXXFLAGS += -I$(QUESTA_HOME)/include -I$(QUESTA_HOME)/include/systemc
 
 
-ifneq (,$(QUESTA_HOME))
-# Set path so we use the compiler with Modelsim
-# PATH := $(QUESTA_HOME)/bin:$(QUESTA_HOME)/gcc-4.5.0-linux/bin:$(PATH)
-# export PATH
-else
-QUESTA_HOME:=$(dir $(dir $(shell which vsim)))
+ifeq (,$(QUESTA_HOME))
+QUESTA_HOME := $(dir $(shell which vsim))
+QUESTA_HOME := $(shell dirname $(QUESTA_HOME))
 endif
 
-# TODO: Auto-identify GCC installation
+ifeq (Cygwin,$(OS))
+# Ensure we're using a Windows-style path for QUESTA_HOME
+QUESTA_HOME:= $(shell cygpath -w $(QUESTA_HOME))
+
+DPI_LIB := -Bsymbolic -L $(QUESTA_HOME)/win64 -lmtipli
+endif
+
+# Auto-identify GCC installation
+ifeq ($(OS),Cygwin)
 GCC_VERSION := 4.5.0
+
+ifeq ($(ARCH),x86_64)
 GCC_INSTALL := $(QUESTA_HOME)/gcc-$(GCC_VERSION)-mingw64vc12
+LD:=$(GCC_INSTALL)/libexec/gcc/$(ARCH)-w64-mingw32/$(GCC_VERSION)/ld
+else
+GCC_INSTALL := $(QUESTA_HOME)/gcc-$(GCC_VERSION)-mingw32vc12
+LD:=$(GCC_INSTALL)/libexec/gcc/$(ARCH)-w32-mingw32/$(GCC_VERSION)/ld
+endif
+
+else # Not Cygwin
+ifeq (,$(wildcard $(QUESTA_HOME)/gcc-4.7.4-linux-*))
+GCC_VERSION := 4.7.4
+else
+GCC_VERSION := 4.5.0
+endif
+
+ifeq ($(ARCH),x86_64)
+GCC_INSTALL := $(QUESTA_HOME)/gcc-$(GCC_VERSION)-linux_x86_64
+else
+GCC_INSTALL := $(QUESTA_HOME)/gcc-$(GCC_VERSION)-linux
+endif
+
+endif
 CC:=$(GCC_INSTALL)/bin/gcc
 CXX:=$(GCC_INSTALL)/bin/g++
-LD:=$(GCC_INSTALL)/libexec/gcc/$(ARCH)-w64-mingw32/4.5.0/ld
 
 ifeq ($(DEBUG),true)
 	TOP=$(TOP_MODULE)_dbg
 	DOFILE_COMMANDS += "log -r /\*;"
 else
 	TOP=$(TOP_MODULE)_opt
-endif
-
-ifeq (Cygwin,$(OS))
-QUESTA_HOME:= $(shell cygpath -w $(QUESTA_HOME))
-
-DPI_LIB := -Bsymbolic -L $(QUESTA_HOME)/win64 -lmtipli
 endif
 
 ifeq (true,$(DYNLINK))
@@ -92,7 +112,7 @@ vopt_compile :
 #endif
 #	vsim -c -do run.do $(TOP) -qwavedb=+signal \
 
-ifeq (true,DYNLINK)
+ifeq (true,$(DYNLINK))
 DPI_LIB_OPTIONS := $(foreach dpi,$(DPI_LIBRARIES),-sv_lib $(dpi))
 else
 # DPI_LIB_OPTIONS := $(foreach dpi,$(DPI_LIBRARIES),-dpilib $(dpi)$(DPIEXT))

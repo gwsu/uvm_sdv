@@ -17,7 +17,7 @@ ifeq (Cygwin,$(OS))
     PLATFORM=cygwin
   endif
 else # Linux
-ifeq ($(shell uname),Linux)
+ifeq (Linux,$(shell uname))
   DLLEXT=.so
   LIBPREF=lib
   DYNLINK=true
@@ -28,6 +28,7 @@ ifeq ($(shell uname),Linux)
   endif
 else
   PLATFORM=unknown
+  DYNLINK=unknown
 endif
 endif
 
@@ -55,6 +56,7 @@ DLLOUT=-shared
 # CXXFLAGS += -I$(SYSTEMC)/include
 ifneq (Cygwin,$(OS))
 CXXFLAGS += -fPIC
+CFLAGS += -fPIC
 else
 CXXFLAGS += -Wno-attributes
 endif

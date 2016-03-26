@@ -207,7 +207,7 @@ DLL_EXPORT int _uvm_sdv_dpi_init(void)
 		uvm_sdv_dpi_read_uvm2sw_p = (void (*)(const char *, uint32_t *, uint32_t *, uint32_t))GetProcAddress(hndl, "_uvm_sdv_dpi_read_uvm2sw");
 		uvm_sdv_dpi_write_sw2uvm_p = (void (*)(const char *, uint32_t))GetProcAddress(hndl, "_uvm_sdv_dpi_write_sw2uvm");
 #else
-		void *hndl = RTLD_DEFAULT;
+		void *hndl = 0;
 		uvm_sdv_dpi_connect_p = (const char *(*)(const char *))dlsym(hndl, "_uvm_sdv_dpi_connect");
 		uvm_sdv_dpi_read_uvm2sw_p = (void (*)(const char *, uint32_t *, uint32_t *, uint32_t))dlsym(hndl, "_uvm_sdv_dpi_read_uvm2sw");
 		uvm_sdv_dpi_write_sw2uvm_p = (void (*)(const char *, uint32_t))dlsym(hndl, "_uvm_sdv_dpi_write_sw2uvm");

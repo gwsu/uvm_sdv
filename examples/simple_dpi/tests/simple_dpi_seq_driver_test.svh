@@ -29,10 +29,12 @@ class simple_dpi_seq_driver_test extends simple_dpi_test_base;
 	endfunction
 
 	/****************************************************************
-	 * main_phase()
+	 * run_phase()
 	 ****************************************************************/
-	task main_phase(uvm_phase phase);
+	task run_phase(uvm_phase phase);
+		phase.raise_objection(this, "Run Phase");
 		test_main("*.m_sdv_connector");
+		phase.drop_objection(this, "Run Phase");
 	endtask	
 	
 endclass
