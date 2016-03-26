@@ -21,7 +21,11 @@ class simple_dpi_config_test extends simple_dpi_test_base;
 	endfunction
 
 	task main_phase(uvm_phase phase);
+		phase.raise_objection(this, "Main");
+		
 		test_main("*.m_sdv_connector");
+		
+		phase.drop_objection(this, "Main");
 	endtask
 	
 	/**

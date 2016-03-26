@@ -45,7 +45,7 @@ static void uvm_sdv_endpoint_zero_recv(void *ud, uvm_sdv_transport_msg_t *msg)
 
 			seq_id = uvm_sdv_unpack_int(&packer, 32);
 
-			printf("Sequence %d ended", seq_id);
+//			printf("Sequence %d ended\n", seq_id);
 
 			uvm_sdv_sequence_ended(seq_id);
 
@@ -57,13 +57,8 @@ static void uvm_sdv_endpoint_zero_recv(void *ud, uvm_sdv_transport_msg_t *msg)
 			// Queue the message for later
 			printf("Error: unexpected endpoint-zero response message: msg_type=%d msg_id=%d\n",
 					msg->msg_type, msg->msg_data[0]);
-			printf("--> queue\n");
 			uvm_sdv_endpoint_queue_msg(&ep_zero->endpoint, msg);
-			printf("<-- queue\n");
 
 		} break;
 	}
-
-	printf("uvm_sdv_endpoint_zero_recv:\n");
-
 }

@@ -10,9 +10,10 @@ uint32_t uvm_sdv_config_db_get_int(
 		const char 		*name,
 		uint64_t 			*val);
 
-uint32_t uvm_sdv_config_db_get_string(
+int32_t uvm_sdv_config_db_get_string(
 		const char 		*name,
-		const char			**val);
+		char			*val,
+		uint32_t		 len);
 
 uint32_t uvm_sdv_config_db_get_object(
 		const char 		*name,

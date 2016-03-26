@@ -45,6 +45,9 @@ void uvm_print(const char *msg)
 	uvm_sdv_pack_string(&packer, msg);
 
 	tp->send_msg(tp, tp_msg);
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 }
 
 /********************************************************************
@@ -72,6 +75,9 @@ void uvm_warning(const char *name, const char *msg, const char *file, int lineno
 	uvm_sdv_pack_int(&packer, lineno, 32);
 
 	tp->send_msg(tp, tp_msg);
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 }
 
 /********************************************************************
@@ -99,6 +105,9 @@ void uvm_error(const char *name, const char *msg, const char *file, int lineno)
 	uvm_sdv_pack_int(&packer, lineno, 32);
 
 	tp->send_msg(tp, tp_msg);
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 }
 
 /********************************************************************
@@ -126,6 +135,9 @@ void uvm_fatal(const char *name, const char *msg, const char *file, int lineno)
 	uvm_sdv_pack_int(&packer, lineno, 32);
 
 	tp->send_msg(tp, tp_msg);
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 }
 
 /********************************************************************
@@ -154,4 +166,7 @@ void uvm_info(const char *name, const char *msg, int verbosity, const char *file
 	uvm_sdv_pack_int(&packer, verbosity, 32);
 
 	tp->send_msg(tp, tp_msg);
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 }

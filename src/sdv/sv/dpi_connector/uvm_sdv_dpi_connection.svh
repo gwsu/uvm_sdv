@@ -23,8 +23,8 @@ class uvm_sdv_dpi_connection;
 		m_sw2uvm_sem = new(1);
 		m_uvm2sw_sem = new(1);
 		
-		m_uvm2sw = new();
-		m_sw2uvm = new();
+		m_uvm2sw = new(1);
+		m_sw2uvm = new(1);
 	endfunction
 	
 	

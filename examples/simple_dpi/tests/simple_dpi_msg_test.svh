@@ -31,7 +31,9 @@ class simple_dpi_msg_test extends simple_dpi_test_base;
 	 * Override from class amber_uvm_sdv_test_base
 	 */
 	virtual task run_phase(input uvm_phase phase);
+		phase.raise_objection(this, "Main");
 		test_main("*.m_sdv_connector");
+		phase.drop_objection(this, "Main");
 	endtask
 
 endclass

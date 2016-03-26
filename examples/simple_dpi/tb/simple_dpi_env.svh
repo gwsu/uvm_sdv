@@ -1,8 +1,8 @@
 
 class simple_dpi_env extends uvm_env;
 	`uvm_component_utils(simple_dpi_env)
-	
-	uvm_sdv_dpi_connector					m_sdv_connector;
+
+	simple_dpi_sdv_connector				m_sdv_connector;
 	uvm_sdv_publisher #(sw_txn)				m_sw_txn_publisher;
 	uvm_sequencer #(sw_txn)					m_sw_txn_seqr;
 	uvm_sdv_driver #(sw_txn)				m_sdv_driver;
@@ -24,7 +24,7 @@ class simple_dpi_env extends uvm_env;
 	 */
 	virtual function void build_phase(input uvm_phase phase);
 		super.build_phase(phase);
-		m_sdv_connector = uvm_sdv_dpi_connector::type_id::create("m_sdv_connector", this);
+		m_sdv_connector = simple_dpi_sdv_connector::type_id::create("m_sdv_connector", this);
 
 		m_sw_txn_publisher = uvm_sdv_publisher #(sw_txn)::type_id::create("m_sw_txn_publisher", this);
 		

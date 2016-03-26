@@ -18,12 +18,12 @@ DLL_EXPORT int test_main (const char *agent_path)
     uvm_sdv_endpoint_mgr_init(uvm_tp);
 
     uvm_sdv_raise_objection(testname, 1);
-    UVM_INFO(testname, uvm_sformat(buf, "Begin Test %s", testname), UVM_MEDIUM);
+    UVM_INFO(testname, uvm_sformat(buf, "Begin Test %s", testname), UVM_LOW);
 
     uvm_sdv_sequencer_driver_init(&sw_txn_seqr, "*.m_sdv_driver", &sw_txn_unpack, 0);
     for (i=0; i<5; i++) {
     	uvm_sdv_sequencer_driver_get_next_item(&sw_txn_seqr, &txn);
-    	UVM_INFO(testname, uvm_sformat(buf, "SEQ_ITEM: A=%d B=%d", txn.A, txn.B), UVM_MEDIUM);
+    	UVM_INFO(testname, uvm_sformat(buf, "SEQ_ITEM: A=%d B=%d", txn.A, txn.B), UVM_LOW);
     	if (txn.A+5 != txn.B) {
     		UVM_ERROR(testname, uvm_sformat(buf, "Expect A+5 == B; A=%d B=%d", txn.A, txn.B));
     	}
@@ -31,6 +31,8 @@ DLL_EXPORT int test_main (const char *agent_path)
     }
 
     uvm_sdv_drop_objection(testname, 1);
+
+    UVM_INFO(testname, "PASS: uvm_sdv_seq_driver_test", UVM_LOW);
 
     return 0;
 }

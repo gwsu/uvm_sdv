@@ -35,7 +35,6 @@ $(BUILD_DIR)/dpi/%$(DPIEXT) : \
 	$(MK_DPI)
 
 %.o : $(UVM_SDV)/c/common/%.c
-	echo "BUILD"
 	$(CC) -c $(CFLAGS) -o $@ $^
 
 %.o : $(UVM_SDV)/dpi/%.c

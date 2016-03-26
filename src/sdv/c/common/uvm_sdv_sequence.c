@@ -84,6 +84,9 @@ uint32_t uvm_sdv_sequence_start(
 
 	tp->free_msg(tp, tp_msg);
 
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
+
 	return seq_id;
 }
 
@@ -94,6 +97,9 @@ uint32_t uvm_sdv_sequence_is_running(uint32_t seq_id)
 {
 	uvm_sdv_endpoint_mgr_t *ep_mgr = uvm_sdv_endpoint_mgr_get();
 	uint32_t i, ret=0;
+
+	// Poll to see if there are messages waiting to be processed
+	uvm_sdv_endpoint_mgr_poll();
 
 	// Search the sequence list
 	for (i=0; i<ep_mgr->active_sequence_list_sz; i++) {
@@ -114,9 +120,6 @@ void uvm_sdv_sequence_ended(uint32_t seq_id)
 	uvm_sdv_endpoint_mgr_t *ep_mgr = uvm_sdv_endpoint_mgr_get();
 	int32_t idx = -1;
 	uint32_t i;
-
-	// Poll to see if there are messages waiting to be processed
-	uvm_sdv_endpoint_mgr_poll();
 
 	// First, find the index
 	for (i=0; i<ep_mgr->active_sequence_list_sz; i++) {

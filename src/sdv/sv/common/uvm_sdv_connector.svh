@@ -271,7 +271,7 @@ class uvm_sdv_connector extends uvm_component;
 						end else begin
 							// Launch the sequence
 							uvm_sdv_sequence_runner runner = new(this, seq_id, seqr, seq);
-							$display("Launching sequence");
+// TODO:							$display("Launching sequence");
 							fork
 								runner.run();
 							join_none

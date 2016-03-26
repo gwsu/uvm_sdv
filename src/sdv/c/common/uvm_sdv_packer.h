@@ -62,6 +62,7 @@ int uvm_sdv_unpack_isnull(
 
 uint32_t uvm_sdv_unpack_string(
 		uvm_sdv_packer_t 			*packer,
-		char						*str);
+		char						*str,
+		uint32_t					len);
 
 #endif /* INCLUDED_UVM_SDV_PACKER_H */

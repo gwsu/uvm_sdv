@@ -56,9 +56,10 @@ uint32_t uvm_sdv_config_db_get_int(
 	return cfg_ex;
 }
 
-uint32_t uvm_sdv_config_db_get_string(
+int32_t uvm_sdv_config_db_get_string(
 		const char 		*name,
-		const char			**val)
+		char			*val,
+		uint32_t		 len)
 {
 	uint32_t cfg_ex = 0;
 	uvm_sdv_transport_t     *tp = uvm_sdv_endpoint_mgr_get_transport();
@@ -66,6 +67,7 @@ uint32_t uvm_sdv_config_db_get_string(
 	uvm_sdv_transport_msg_t *msg = tp->alloc_msg(tp, 0);
 	uvm_sdv_packer_t packer;
 	uint32_t msg_id;
+	int32_t val_len;
 
 	uvm_sdv_packer_init(&packer, msg);
 
@@ -93,11 +95,8 @@ uint32_t uvm_sdv_config_db_get_string(
 	cfg_ex = uvm_sdv_unpack_int(&packer, 32);
 
 	if (cfg_ex) {
-		uint32_t val_len = uvm_sdv_unpack_string(&packer, 0);
-		char *val_tmp = (char *)malloc(sizeof(char)*val_len);
-
-		uvm_sdv_unpack_string(&packer, val_tmp);
-		*val = val_tmp;
+		val_len = uvm_sdv_unpack_string(&packer, 0, 0);
+		uvm_sdv_unpack_string(&packer, val, len);
 	} else {
 		*val = 0;
 	}
@@ -105,7 +104,7 @@ uint32_t uvm_sdv_config_db_get_string(
 	// Return the message to the transport
 	tp->free_msg(tp, msg);
 
-	return cfg_ex;
+	return (cfg_ex)?val_len:-1;
 }
 
 uint32_t uvm_sdv_config_db_get_object(

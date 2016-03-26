@@ -23,5 +23,6 @@ package simple_dpi_tests_pkg;
 	`include "simple_dpi_ap_test.svh"
 	`include "simple_dpi_msg_test.svh"
 	`include "simple_dpi_seq_driver_test.svh"
+    `include "simple_dpi_sequence_test.svh"
 	
 endpackage

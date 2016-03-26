@@ -436,7 +436,7 @@ sub build {
     
     $ENV{PLUSARGS} = $all_plusargs;
     
-    print "BUILD: all_plusargs=$all_plusargs\n";
+#    print "BUILD: all_plusargs=$all_plusargs\n";
 
     system("mkdir -p ${builddir}") && die;
     chdir("$builddir");
@@ -561,9 +561,6 @@ sub run_jobs {
                     	);
                 
                 	
-#                	print "testname=$testname\n"; 
-                    
-                   
                     open(my $fh, "$SIM_DIR/scripts/status.sh $testname |") or die "Failed to launch check program";
                     
                     $result = <$fh>;
@@ -580,7 +577,7 @@ sub run_jobs {
                 $seed++;
 
                 # Launched the number requested
-                if ($testlist_idx >= $#testlist) {
+                if ($testlist_idx > $#testlist) {
                   $launch_sims = 0;
                 }
             }

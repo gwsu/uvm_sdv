@@ -133,7 +133,8 @@ int uvm_sdv_unpack_isnull(
 
 uint32_t uvm_sdv_unpack_string(
 		uvm_sdv_packer_t				*packer,
-		char							*str)
+		char							*str,
+		uint32_t						len)
 {
 	uvm_sdv_transport_msg_t *msg = packer->msg;
 	uint32_t ret = 0;
@@ -145,7 +146,7 @@ uint32_t uvm_sdv_unpack_string(
 
 		ret *= 4;
 
-		for (i=0; i<ret; i++) {
+		for (i=0; i<ret && i<len; i+=4) {
 			uint32_t v = msg->msg_data[packer->idx++];
 
 			*(str++) = v;

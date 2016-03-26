@@ -50,21 +50,24 @@ class simple_dpi_ap_test extends simple_dpi_test_base;
 		int stream_id;
 		int trans_h = -1;
 		
-		fork 
-			begin
-				test_main("*.m_sdv_connector");
+		phase.raise_objection(this, "Main");
+		
+		fork begin
+			forever begin
+				m_analysis_fifo.get(txn);
+			
+				`uvm_info(get_name(), $psprintf("txn: A=%0d B=%0d", txn.A, txn.B), UVM_MEDIUM);
+				if (txn.A+5 != txn.B) begin
+					`uvm_error(get_name(), $psprintf("Expect B == A+5; A=%0d B=%0d", txn.A, txn.B));
+				end
+				m_transaction_count++;
 			end
+		end
 		join_none
 		
-		forever begin
-			m_analysis_fifo.get(txn);
-			
-			`uvm_info(get_name(), $psprintf("txn: A=%0d B=%0d", txn.A, txn.B), UVM_MEDIUM);
-			if (txn.A+5 != txn.B) begin
-				`uvm_error(get_name(), $psprintf("Expect B == A+5; A=%0d B=%0d", txn.A, txn.B));
-			end
-			m_transaction_count++;
-		end
+		test_main("*.m_sdv_connector");
+		
+		phase.drop_objection(this, "Main");
 	endtask
 
 	/**
