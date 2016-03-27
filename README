@@ -1,0 +1,54 @@
+
+
+The UVM SDV project provides software-driven verification (SDV) extensions to UVM. Specifically,
+the project enables connections between the UVM and embedded-software portions of a testbench.
+
+There are several key components of infrastructure in the UVM SDVM extensions:
+- Transport layer: Manages sending messages between UVM and SW. The transport layer is
+  designed for modularity, so different mechanisms can be used without substantive 
+  changes to the UVM SDV library or test.
+  Two transports are provided:
+  - DPI-based transport used for testing.
+  - Shared memory-based transport based on polling (ie not interrupt-driven).
+  
+- C API: Provide services to C/C++ embedded software tests to synchronize and
+  interact with the UVM testbench
+  - Get configuration values from the UVM configuration database. Note that the
+    config variables are obtained from the UVM SDV 'connector' component. In other
+    words, in most cases some action must be taken in the UVM testbench to make
+    config variables available to the C test.
+  - Receive transactions from sequences running on a 'uvm_sdv_driver' in the
+    UVM testbench.
+  - Send transactions to an analysis port in the UVM testbench
+  - Launch sequences in the UVM testbench and monitor their completion status.
+
+- UVM Components: 
+  - UVM SDV Connector: Specific implementations of the connector implement 
+    specific transports, such as DPI-based or shared memory 
+  - UVM SDV Driver: Driver that packs transactions received from the running
+    sequence and sends them to the SW test via the UVM SDV Connector.
+  - UVM SDV Analysis publisher: receives transactions from the C test and publishes
+    them in the UVM environment.
+
+== Running Tests ==
+The 'simple_dpi' testbench uses the DPI-based transport. Host-compiled C tests are used to
+test the SDV library implementation.
+A 'test' in this environment really consists of a UVM test class and a C test file. For example:
+tests/simple_dpi_ap_test.svh and tests/sw/uvm_sdv_ap_test.c together test the analysis-port
+functionality.
+
+In order to run these tests, it is assumed you have Questa 10.4 or greater installed and
+the tools (eg vsim, vlog) available in the path. If running on a 64-bit machine, the 
+64-bit version of Questa must be installed.
+
+- First, change directory to the examples/simple_dpi/sim directory
+% cd examples/simple_dpi/sim
+
+- Next, source the setup script in the 'common' directory. Note that Bourne shell (or Bash) is assumed
+% . ../../common/set_env.sh
+    
+- Next, run a test using the runtest.pl script
+% runtest.pl -test tests/uvm_sdv_ap_test.f
+
+- To run all the tests:
+% runtest.pl -testlst testlists/alltests.tl 
