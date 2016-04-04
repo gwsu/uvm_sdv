@@ -1,5 +1,5 @@
 
-include $(ROOTDIR)/common/plusargs.mk
+include $(SIMSCRIPTS_DIR)/mkfiles/plusargs.mk
 
 UVM_SDV:=$(ROOTDIR)/../src/sdv
 include $(UVM_SDV)/c/rules_defs.mk
@@ -22,7 +22,7 @@ CFLAGS += \
   -I$(UVM_SDV)/dpi
 
 	
-include $(ROOTDIR)/common/common_sim.mk
+include $(SIMSCRIPTS_DIR)/mkfiles/common_sim.mk
 
 # SIM_DATAFILES += $(call get_plusarg,SW_IMAGE,$(PLUSARGS))
 # UVM_TESTNAME := $(call get_plusarg,UVM_TESTNAME,$(PLUSARGS))

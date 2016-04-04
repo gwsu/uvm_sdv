@@ -1,5 +1,5 @@
 
-ROOTDIR=`dirname $SIMSCRIPTS_DIR`
+export ROOTDIR=`dirname $SIMSCRIPTS_DIR`
 
 if test `uname -o` = "Cygwin"; then
   ROOTDIR=`cygpath -w $ROOTDIR`
