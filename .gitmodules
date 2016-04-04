@@ -1,3 +1,4 @@
 [submodule "examples/simscripts"]
 	path = examples/simscripts
 	url = https://github.com/mballance/simscripts.git
+	branch = master
