@@ -45,7 +45,7 @@ the tools (eg vsim, vlog) available in the path. If running on a 64-bit machine,
 % cd examples/simple_dpi/sim
 
 - Next, source the setup script in the 'common' directory. Note that Bourne shell (or Bash) is assumed
-% . ../../common/set_env.sh
+% . ../../simscripts/set_env.sh
     
 - Next, run a test using the runtest.pl script
 % runtest.pl -test tests/uvm_sdv_ap_test.f
